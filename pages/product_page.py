@@ -10,13 +10,15 @@ class ProductPage(BasePage):
         assert self.is_element_present(*ProductPageLocators.ALLERT_MESSAGE_NAME), "Alert message with product name is not presented"
     
     def test_should_be_product_name_equal(self):
-        Name = self.browser.find_element(*ProductPageLocators.PRODUCT_NAME ).text
-        assert Name in self.browser.find_element(*ProductPageLocators.ALLERT_MESSAGE_NAME).text, "name does not match" 
+        Name = self.browser.find_element(*ProductPageLocators.PRODUCT_NAME).text
+        BasketName = self.browser.find_element(*ProductPageLocators.ALLERT_MESSAGE_NAME_VALUE).text
+        assert Name == BasketName, print("'",Name,"'", "name does not match","'",BasketName,"'") 
 
     def test_should_be_price_message(self):
         assert self.is_element_present(*ProductPageLocators.ALLERT_MESSAGE_PRICE), "Alert message with product price is not presented" 
         
     def test_should_be_price_equal(self):
         Price = self.browser.find_element(*ProductPageLocators.PRODUCT_PRICE).text
-        assert Price in self.browser.find_element(*ProductPageLocators.ALLERT_MESSAGE_PRICE_VALUE).text, "Price does not match" 
+        BasketPrice = self.browser.find_element(*ProductPageLocators.ALLERT_MESSAGE_PRICE_VALUE).text
+        assert Price == BasketPrice, print("'",Price,"'", " price does not match ","'",BasketPrice,"'")  
     
