@@ -3,6 +3,10 @@ from .locators import BasketPageLocators
 
 class BasketPage(BasePage):
 
+    def test_should_be_epmty_basket(self):
+        self.should_not_be_items()
+        self.test_should_be_empty_message()
+
     def should_not_be_items(self):
         assert self.is_not_element_present(*BasketPageLocators.BASKET_ITEMS), \
         "Items are presented, but should not be"

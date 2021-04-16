@@ -1,5 +1,4 @@
 from .locators import BasePageLocators
-import pytest
 from selenium.common.exceptions import NoSuchElementException
 from selenium.common.exceptions import NoAlertPresentException
 import math
@@ -8,7 +7,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 
 class BasePage():
-    def __init__(self, browser, url, timeout=10):
+    def __init__(self, browser, url, timeout=1):
         self.browser = browser
         self.url = url
         self.browser.implicitly_wait(timeout)
@@ -64,3 +63,7 @@ class BasePage():
             return False
 
         return True
+        
+    def should_be_authorized_user(self):
+        assert self.is_element_present(*BasePageLocators.USER_ICON), "User icon is not presented," \
+                                                                 " probably unauthorised user"

@@ -1,41 +1,45 @@
 from .pages.product_page import ProductPage
 from .pages.basket_page import BasketPage
+from .pages.login_page import LoginPage
 import pytest
 import time
 
-#@pytest.mark.parametrize('link', ["http://selenium1py.pythonanywhere.com/catalogue/coders-at-work_207/?promo=offer0"])
-                                  
-#def test_guest_can_add_product_to_basket(browser, link):
-#    link = f"{link}"
-#    page = ProductPage(browser, link)   # инициализируем Page Object, передаем в конструктор экземпляр драйвера и url адрес 
-#    page.open()                      # открываем страницу
-#    page.should_not_be_success_message()
-#    page.test_add_to_basket()
-#    page.solve_quiz_and_get_code()
-#    #time.sleep(10)
-#    page.test_should_be_basket_message()
-#    page.test_should_be_product_name_equal()
-#    page.test_should_be_price_message()
-#    page.test_should_be_price_equal()
+@pytest.mark.parametrize('link', ["http://selenium1py.pythonanywhere.com/catalogue/coders-at-work_207/?promo=offer0",
+                                  "http://selenium1py.pythonanywhere.com/catalogue/coders-at-work_207/?promo=offer1",
+                                  "http://selenium1py.pythonanywhere.com/catalogue/coders-at-work_207/?promo=offer2",
+                                  "http://selenium1py.pythonanywhere.com/catalogue/coders-at-work_207/?promo=offer3",
+                                  "http://selenium1py.pythonanywhere.com/catalogue/coders-at-work_207/?promo=offer4",
+                                  "http://selenium1py.pythonanywhere.com/catalogue/coders-at-work_207/?promo=offer5",
+                                  "http://selenium1py.pythonanywhere.com/catalogue/coders-at-work_207/?promo=offer6",
+                                   pytest.param("http://selenium1py.pythonanywhere.com/catalogue/coders-at-work_207/?promo=offer7", marks=pytest.mark.xfail),
+                                  "http://selenium1py.pythonanywhere.com/catalogue/coders-at-work_207/?promo=offer8",
+                                  "http://selenium1py.pythonanywhere.com/catalogue/coders-at-work_207/?promo=offer9"])
+@pytest.mark.need_review                                  
+def test_guest_can_add_product_to_basket(browser, link):
+    link = f"{link}"    #подстановка параметров
+    page = ProductPage(browser, link)   # инициализируем Page Object, передаем в конструктор экземпляр драйвера и url адрес 
+    page.open()                      # открываем страницу
+    page.should_not_be_success_message() #проверяем отсутствие сообщения об успехе
+    page.test_add_to_basket() #добавляем товар в корзину
+    page.solve_quiz_and_get_code() #проходим капчу
+    page.test_correct_product_add() #проверяем наличие сообщений и совпадение с товаром
 
-#@pytest.mark.xfail(reason="correct work")
-@pytest.mark.skip    
+
+@pytest.mark.xfail(reason="correct work")   
 def test_guest_cant_see_success_message_after_adding_product_to_basket(browser): 
     link = "http://selenium1py.pythonanywhere.com/catalogue/coders-at-work_207"
     page = ProductPage(browser, link)    
     page.open()                      
     page.test_add_to_basket()
     page.should_not_be_success_message() 
-
-@pytest.mark.skip   
+ 
 def test_guest_cant_see_success_message(browser): 
     link = "http://selenium1py.pythonanywhere.com/catalogue/coders-at-work_207"
     page = ProductPage(browser, link)    
     page.open()                      
     page.should_not_be_success_message() 
     
-#@pytest.mark.xfail(reason="correct work") 
-@pytest.mark.skip 
+@pytest.mark.xfail(reason="correct work")  
 def test_message_disappeared_after_adding_product_to_basket(browser): 
     link = "http://selenium1py.pythonanywhere.com/catalogue/coders-at-work_207"
     page = ProductPage(browser, link)   
@@ -43,29 +47,55 @@ def test_message_disappeared_after_adding_product_to_basket(browser):
     page.test_add_to_basket()
     page.should_dissapear_of_success_message() 
 
-@pytest.mark.skip
 def test_guest_should_see_login_link_on_product_page(browser):
     link = "http://selenium1py.pythonanywhere.com/en-gb/catalogue/the-city-and-the-stars_95/"
     page = ProductPage(browser, link)
     page.open()
     page.should_be_login_link()
-
-@pytest.mark.skip    
+    
+@pytest.mark.need_review    
 def test_guest_can_go_to_login_page_from_product_page(browser):
     link = "http://selenium1py.pythonanywhere.com/en-gb/catalogue/the-city-and-the-stars_95/"
     page = ProductPage(browser, link)
     page.open()
     page.go_to_login_page()
-    
+ 
+@pytest.mark.need_review 
 def test_guest_cant_see_product_in_basket_opened_from_product_page(browser):
     link = "http://selenium1py.pythonanywhere.com/catalogue/coders-at-work_207"
     page = ProductPage(browser, link)   
     page.open()   #Гость открывает страницу товара
-    page.test_add_to_basket()
     page.go_to_basket_page() #Переходит в корзину по кнопке в шапке
-    basket_page = BasketPage(browser, browser.current_url)
-    basket_page.should_not_be_items() #Ожидаем, что в корзине нет товаров
-    basket_page.test_should_be_empty_message() #Ожидаем, что есть текст о том что корзина пуста 
+    basket_page = BasketPage(browser, browser.current_url) #переходим на другой PO
+    basket_page.test_should_be_epmty_basket() #Ожидаем, что в корзине нет товаров и есть сообщение о пустой корзине
+    
+    
+class TestUserAddToBasketFromProductPage():
+    @pytest.fixture(scope="function", autouse=True)
+    def setup(self,browser):
+        link = "http://selenium1py.pythonanywhere.com/catalogue/coders-at-work_207"
+        page = LoginPage(browser,link)
+        page.open()
+        page.go_to_login_page()
+        email = str(time.time()) + "@fakemail.org"
+        password = 'edcxswqaz1'
+        page.register_new_user(email, password)
+        page.should_be_authorized_user()
+           
+    def test_user_cant_see_success_message(self, browser): 
+        link = "http://selenium1py.pythonanywhere.com/catalogue/coders-at-work_207"
+        page = ProductPage(browser, link)    
+        page.open()                      
+        page.should_not_be_success_message() 
+        
+    @pytest.mark.need_review    
+    def test_user_can_add_product_to_basket(self, browser):
+        link = "http://selenium1py.pythonanywhere.com/catalogue/coders-at-work_207"
+        page = ProductPage(browser, link)            
+        page.open()                                
+        page.should_not_be_success_message()           
+        page.test_add_to_basket()
+        page.test_correct_product_add()
 
  
 
